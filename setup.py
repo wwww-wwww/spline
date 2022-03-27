@@ -1,0 +1,10 @@
+from distutils.core import setup, Extension
+
+setup(name='optimize',
+      version='1.0',
+      ext_modules=[
+        Extension(
+          'optimize',
+          ['optimize_py.cpp'],
+        )
+      ])

@@ -140,15 +140,16 @@ int main(int argc, char *argv[]) {
     points.push_back({x, y});
   }
 
-  { // delete middle
+  // delete middle
+  int margin = 1;
+  if (points.size() - margin * 2 > 0) {
     auto remove_op = [](std::vector<Point> &line1, std::vector<Point> &line2,
                         int start, int center,
                         int end) { line2.erase(line2.begin() + center); };
 
-    int margin = 1;
     std::vector<double> errors;
     errors.resize(points.size() - margin * 2);
-    for (int i = margin; i < points.size() - margin; i++) {
+    for (int i = margin; i < (int)points.size() - margin; i++) {
       errors[i - margin] = error_remove(points, i, remove_op);
     }
 
@@ -176,7 +177,9 @@ int main(int argc, char *argv[]) {
     }
   }
 
-  { // delete middle and shift surrounding points to the 1/3 and 2/3 positions
+  // delete middle and shift surrounding points to the 1/3 and 2/3 positions
+  margin = 2;
+  if (points.size() - margin * 2 > 0) {
     auto remove_op = [](std::vector<Point> &line1, std::vector<Point> &line2,
                         int start, int center, int end) {
       line2.erase(line2.begin() + center);
@@ -184,7 +187,6 @@ int main(int argc, char *argv[]) {
       line2[center] = catmull_rom(line1.data() + center, 2.0 / 3);
     };
 
-    int margin = 2;
     std::vector<double> errors;
     errors.resize(points.size() - margin * 2);
     for (int i = margin; i < points.size() - margin; i++) {

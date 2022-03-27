@@ -6,6 +6,7 @@ import svgpathtools
 import sys
 import xml.etree.ElementTree
 from svgpathtools import CubicBezier, QuadraticBezier, Arc, Line
+import optimize
 
 # used for noise
 gradients = [
@@ -94,21 +95,11 @@ def sample_line(p0, p1):
     t += 1
   return points or [p0, p1]
 
-
-def optimize(points, error, scale):
-  points_s = "\n".join([f"{p[0]} {p[1]}" for p in points])
-  p = subprocess.run(["./optimize", f"{error * (scale ** 2)}"],
-                     input=points_s,
-                     text=True,
-                     universal_newlines=True,
-                     capture_output=True)
-  lines = [line.split(" ") for line in p.stdout.splitlines() if line]
-  return [(float(line[0]), float(line[1])) for line in lines]
-
-
-def create_spline(points, error, scale, color=[255, 255, 255]):
+def create_spline(points, error, scale):
   if len(points) > 2:
-    points = optimize(points, error, scale)
+    old_len = len(points)
+    points = optimize.optimize(points, error * (scale ** 2))
+    print(f"{old_len} -> {len(points)}")
 
   if len(points) < 2:
     return ""
