@@ -6,7 +6,6 @@ import sys
 import xml.etree.ElementTree
 from svgpathtools import CubicBezier, QuadraticBezier, Arc, Line
 import optimize
-from typing import Any
 
 # used for noise
 gradients = [
@@ -20,34 +19,32 @@ gradients = [
   [-1, -1],
 ]
 
-Point = tuple[float, float]
 
-
-def bezier1d(p0: Point, p1: Point, p2: Point, p3: Point, t: float) -> Point:
+def bezier1d(p0, p1, p2, p3, t):
   return p0 * (1 - t)**3 + 3 * p1 * t * (1 - t)**2 + 3 * p2 * t**2 * (
     1 - t) + p3 * t**3
 
 
-def bezier2d(p0: Point, p1: Point, p2: Point, p3: Point, t: float) -> Point:
+def bezier2d(p0, p1, p2, p3, t):
   return (
     bezier1d(p0[0], p1[0], p2[0], p3[0], t),
     bezier1d(p0[1], p1[1], p2[1], p3[1], t),
   )
 
 
-def bezier1d_dt(p0: Point, p1: Point, p2: Point, p3: Point, t: float) -> Point:
+def bezier1d_dt(p0, p1, p2, p3, t):
   return 3 * (1 - t)**2 * (p1 - p0) + 6 * t * (1 - t) * (
     p2 - p1) + 3 * t**2 * (p3 - p2)
 
 
-def bezier2d_dt(p0: Point, p1: Point, p2: Point, p3: Point, t: float) -> Point:
+def bezier2d_dt(p0, p1, p2, p3, t):
   return (
     bezier1d_dt(p0[0], p1[0], p2[0], p3[0], t),
     bezier1d_dt(p0[1], p1[1], p2[1], p3[1], t),
   )
 
 
-def sample_bezier(p0: Point, p1: Point, p2: Point, p3: Point) -> list[Point]:
+def sample_bezier(p0, p1, p2, p3):
   points = []
 
   t = 0
@@ -65,30 +62,30 @@ def sample_bezier(p0: Point, p1: Point, p2: Point, p3: Point) -> list[Point]:
   return points
 
 
-def diff(p1: Point, p2: Point) -> Point:
+def diff(p1, p2):
   return (p1[0] - p2[0], p1[1] - p2[1])
 
 
-def length(x: float, y: float) -> float:
+def length(x, y):
   return math.sqrt(math.pow(x, 2) + math.pow(y, 2))
 
 
-def norm(p1: Point) -> Point:
+def norm(p1):
   p1_length = length(p1[0], p1[1]) or 1
   return (p1[0] / p1_length, p1[1] / p1_length)
 
 
 # euclidean distance
-def dist(p1: Point, p2: Point) -> float:
+def dist(p1, p2):
   return length(p1[0] - p2[0], p1[1] - p2[1])
 
 
 # same rounded point
-def sim(p1: Point, p2: Point) -> bool:
+def sim(p1, p2):
   return round(p1[0]) == round(p2[0]) and round(p1[1]) == round(p2[1])
 
 
-def sample_line(p0: Point, p1: Point) -> list[Point]:
+def sample_line(p0, p1):
   points = []
   d = diff(p1, p0)
   n = norm(d)
@@ -100,7 +97,7 @@ def sample_line(p0: Point, p1: Point) -> list[Point]:
   return points or [p0, p1]
 
 
-def create_spline(points: list[Point], args: Any, color: list[int]):
+def create_spline(points, args, color):
   if len(points) > 2:
     old_len = len(points)
     points = optimize.optimize(points, args.error * (args.scale**2))
@@ -146,7 +143,7 @@ def create_spline(points: list[Point], args: Any, color: list[int]):
   return spline
 
 
-if __name__ == "__main__":
+def main():
   parser = argparse.ArgumentParser()
   parser.add_argument("input", help="Input SVG file")
   parser.add_argument("output", help="Output jxl tree")
