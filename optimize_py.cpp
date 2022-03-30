@@ -147,7 +147,7 @@ static PyObject *optimize_py(PyObject *self, PyObject *args) {
 
   // delete middle
   int margin = 1;
-  if (points.size() - margin * 2 > 0) {
+  if ((int)points.size() - margin * 2 > 0) {
     auto remove_op = [](std::vector<Point> &line1, std::vector<Point> &line2,
                         int start, int center,
                         int end) { line2.erase(line2.begin() + center); };
@@ -160,7 +160,7 @@ static PyObject *optimize_py(PyObject *self, PyObject *args) {
 
     int min;
     float err = 0;
-    while (err < error) {
+    while (errors.size() > 0 && err < error) {
       min = std::min_element(errors.begin(), errors.end()) - errors.begin();
       err = errors[min];
 
@@ -178,7 +178,7 @@ static PyObject *optimize_py(PyObject *self, PyObject *args) {
 
   // delete middle and shift surrounding points to the 1/3 and 2/3 positions
   margin = 2;
-  if (points.size() - margin * 2 > 0) {
+  if ((int)points.size() - margin * 2 > 0) {
     auto remove_op = [](std::vector<Point> &line1, std::vector<Point> &line2,
                         int start, int center, int end) {
       line2.erase(line2.begin() + center);
@@ -194,7 +194,7 @@ static PyObject *optimize_py(PyObject *self, PyObject *args) {
 
     int min;
     float err = 0;
-    while (err < error / 2) {
+    while (errors.size() > 0 && err < error / 2) {
       min = std::min_element(errors.begin(), errors.end()) - errors.begin();
       err = errors[min];
 
