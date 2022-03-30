@@ -3,15 +3,14 @@
 ## Installation
 
 ```
-python3 setup.py build
-python3 setup.py install --user
+pip3 install git+https://github.com/wwww-wwww/spline
 ```
 
 
 ## Usage
 
 ```
-python3 svg2jxl.py [OPTIONS] INPUT OUTPUT
+svg2jxl [OPTIONS] INPUT OUTPUT
 ```
 
 ## Options
