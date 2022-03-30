@@ -150,14 +150,26 @@ if __name__ == "__main__":
   parser = argparse.ArgumentParser()
   parser.add_argument("input", help="Input SVG file")
   parser.add_argument("output", help="Output jxl tree")
-  parser.add_argument("-s", "--scale", type=float, default=1)
-  parser.add_argument("-u", "--upsample", type=int, default=1)
+  parser.add_argument("-s",
+                      "--scale",
+                      type=float,
+                      default=1,
+                      help="Scale for working resolution")
+  parser.add_argument("-u",
+                      "--upsample",
+                      type=int,
+                      default=1,
+                      help="JXL tree Upsample")
   parser.add_argument("-e",
                       "--error",
                       help="Allowed error, multiplied by scale^2",
                       type=float,
                       default=1)
-  parser.add_argument("-b", "--bitdepth", type=int, default=4)
+  parser.add_argument("-b",
+                      "--bitdepth",
+                      type=int,
+                      default=4,
+                      help="Bitdepth for colors and JXL")
   parser.add_argument("-t",
                       "--thickness",
                       type=float,
