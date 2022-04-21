@@ -3,6 +3,9 @@ import math
 import random
 import svgpathtools
 import sys
+import io
+import zlib
+import base64
 import xml.etree.ElementTree
 from svgpathtools import CubicBezier, QuadraticBezier, Arc, Line
 import optimize
@@ -101,7 +104,8 @@ def create_spline(points, args, color):
   if len(points) > 2:
     old_len = len(points)
     points = optimize.optimize(points, args.error * (args.scale**2))
-    print(f"{old_len} -> {len(points)}")
+    if args.verbose:
+      print(f"Spline with points: {old_len} -> {len(points)}")
 
   if len(points) < 2:
     return ""
@@ -146,47 +150,51 @@ def create_spline(points, args, color):
 def main():
   parser = argparse.ArgumentParser()
   parser.add_argument("input", help="Input SVG file")
-  parser.add_argument("output", help="Output jxl tree")
+  parser.add_argument("output", help="Output jxl tree", nargs='?')
   parser.add_argument("-s",
                       "--scale",
                       type=float,
                       default=1,
-                      help="Scale for working resolution")
+                      help="Scale for working resolution (default: 1)")
   parser.add_argument("-u",
                       "--upsample",
                       type=int,
                       default=1,
-                      help="JXL tree Upsample")
+                      help="JXL tree upsample (default: 1)")
   parser.add_argument("-e",
                       "--error",
-                      help="Allowed error, multiplied by scale^2",
+                      help="Allowed error, multiplied by scale^2  (default: 1)",
                       type=float,
                       default=1)
   parser.add_argument("-b",
                       "--bitdepth",
                       type=int,
                       default=4,
-                      help="Bitdepth for colors and JXL")
+                      help="Bitdepth for colors and JXL (default: 4)")
   parser.add_argument("-t",
                       "--thickness",
                       type=float,
                       default=0.5,
-                      help="thickness for black lines")
+                      help="thickness for black lines (default: 0.5)")
   parser.add_argument("-tc",
                       "--thicknessc",
                       type=float,
                       default=0.5,
-                      help="thickness for colored lines")
+                      help="thickness for colored lines (default: 0.5)")
   parser.add_argument("-sat",
                       "--saturation",
                       type=float,
                       default=1,
-                      help="saturation for black lines")
+                      help="saturation for black lines (default: 1)")
   parser.add_argument("-satc",
                       "--saturationc",
                       type=float,
                       default=1,
-                      help="saturation for colored lines")
+                      help="saturation for colored lines (default: 1)")
+  parser.add_argument("-v",
+                      "--verbose",
+                      action="store_true",
+                      help="print more information to stdout")
 
   args = parser.parse_args()
 
@@ -223,7 +231,9 @@ def main():
   scale_x = width / viewBox[2]
   scale_y = height / viewBox[3]
 
-  with open(args.output, "w+") as output:
+  output = io.StringIO() if args.output is None else open(args.output, "w+")
+
+  try:
     output.write(header)
     splines = []
 
@@ -331,8 +341,8 @@ def main():
             cubic_points.pop(0)
 
           current_spline.extend(cubic_points)
-        else:
-          print(type(segment))
+        elif args.verbose:
+          print("Ignored segment: " + str(type(segment)))
 
       if current_spline:
         spline = create_spline(current_spline, args, color)
@@ -345,3 +355,12 @@ def main():
             output.flush()
 
     output.write(f"- Set {2 ** args.bitdepth - 1}")
+
+    if args.output is None:
+      output_bytes = output.getvalue().encode()
+      output_gzip_bytes = zlib.compress(output_bytes, level=9)
+      output_b64_bytes = base64.b64encode(output_gzip_bytes[2:-4], altchars=b"-_")
+      zcode = output_b64_bytes.decode().replace("=", "")
+      print(f"https://jxl-art.surma.technology/?zcode={zcode}")
+  finally:
+    output.close()
