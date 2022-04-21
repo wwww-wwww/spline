@@ -105,7 +105,7 @@ def create_spline(points, args, color):
     old_len = len(points)
     points = optimize.optimize(points, args.error * (args.scale**2))
     if args.verbose:
-        print(f"Spline with points: {old_len} -> {len(points)}")
+      print(f"Spline with points: {old_len} -> {len(points)}")
 
   if len(points) < 2:
     return ""
@@ -357,7 +357,10 @@ def main():
     output.write(f"- Set {2 ** args.bitdepth - 1}")
 
     if args.output is None:
-        zcode = base64.b64encode(zlib.compress(output.getvalue().encode(), level=9)[2:-4], altchars=b"-_").decode().replace("=", "")
-        print(f"https://jxl-art.surma.technology/?zcode={zcode}")
+      output_bytes = output.getvalue().encode()
+      output_gzip_bytes = zlib.compress(output_bytes, level=9)
+      output_b64_bytes = base64.b64encode(output_gzip_bytes[2:-4], altchars=b"-_")
+      zcode = output_b64_bytes.decode().replace("=", "")
+      print(f"https://jxl-art.surma.technology/?zcode={zcode}")
   finally:
     output.close()
