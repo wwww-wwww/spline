@@ -131,9 +131,9 @@ def create_spline(points, args, color, thickness):
 
   bitdepth = args.bitdepth
 
-  if args.sharpness and thickness > 0.5:
-    thickness -= 0.25
-    bitdepth += 1
+  if args.sharpness > 0 and thickness > 0.5:
+    thickness -= args.sharpness / 4
+    bitdepth += args.sharpness
 
   new_color = [
     round((c / 255 - 1) * (2**(bitdepth - 1) - 1)) * sat for c in color
@@ -201,7 +201,7 @@ def main():
                       "--sharpness",
                       type=int,
                       default=1,
-                      help="Add sharpness to thick lines (default: 1)")
+                      help="Sharpness for thicker lines (default: 1)")
   parser.add_argument("-v",
                       "--verbose",
                       action="store_true",
