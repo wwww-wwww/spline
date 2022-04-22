@@ -105,7 +105,7 @@ def create_spline(points, args, color):
     old_len = len(points)
     points = optimize.optimize(points, args.error * (args.scale**2))
     if args.verbose:
-      print(f"Spline with points: {old_len} -> {len(points)}")
+      print(f"Optimized spline points: {old_len} -> {len(points)}")
 
   if len(points) < 2:
     return ""
@@ -150,7 +150,7 @@ def create_spline(points, args, color):
 def main():
   parser = argparse.ArgumentParser()
   parser.add_argument("input", help="Input SVG file")
-  parser.add_argument("output", help="Output jxl tree", nargs='?')
+  parser.add_argument("output", help="Output JXL tree", nargs='?')
   parser.add_argument("-s",
                       "--scale",
                       type=float,
@@ -222,11 +222,11 @@ def main():
   height *= args.scale
 
   header = f"""Bitdepth {args.bitdepth}
-  Upsample {args.upsample}
-  Width {round(width)}
-  Height {round(height)}
-  RCT 0
-  """
+Upsample {args.upsample}
+Width {round(width)}
+Height {round(height)}
+RCT 0
+"""
 
   scale_x = width / viewBox[2]
   scale_y = height / viewBox[3]
@@ -341,8 +341,8 @@ def main():
             cubic_points.pop(0)
 
           current_spline.extend(cubic_points)
-        elif args.verbose:
-          print("Ignored segment: " + str(type(segment)))
+        elif type(segment) == Arc:
+          path.extend(segment.as_cubic_curves(curves=2))
 
       if current_spline:
         spline = create_spline(current_spline, args, color)
