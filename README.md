@@ -10,8 +10,10 @@ pip3 install git+https://github.com/wwww-wwww/spline
 ## Usage
 
 ```
-svg2jxl [OPTIONS] INPUT OUTPUT
+svg2jxl [OPTIONS] INPUT [OUTPUT]
 ```
+
+If `OUTPUT` is missing, then svg2jxl prints the [JXL Art](https://jxl-art.surma.technology) URL to stdout.
 
 ## Options
 
@@ -25,6 +27,7 @@ svg2jxl [OPTIONS] INPUT OUTPUT
 -tc THICKNESSC, --thicknessc THICKNESSC       Thickness for colored lines
 -sat SATURATION, --saturation SATURATION      Saturation for black lines
 -satc SATURATIONC, --saturationc SATURATIONC  Saturation for colored lines
+-v, --verbose                                 Print more information to stdout
 ```
 
 ## Example
