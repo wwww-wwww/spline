@@ -18,7 +18,7 @@ If `OUTPUT` is missing, then svg2jxl prints the [JXL Art](https://jxl-art.surma.
 ## Options
 
 ```
--h, --help                                    show this help message and exit
+-h, --help                                    Show this help message and exit
 -s SCALE, --scale SCALE                       Scale for working resolution
 -u UPSAMPLE, --upsample UPSAMPLE              JXL tree Upsample
 -e ERROR, --error ERROR                       Allowed error, multiplied by scale^2
@@ -27,6 +27,7 @@ If `OUTPUT` is missing, then svg2jxl prints the [JXL Art](https://jxl-art.surma.
 -tc THICKNESSC, --thicknessc THICKNESSC       Thickness for colored lines
 -sat SATURATION, --saturation SATURATION      Saturation for black lines
 -satc SATURATIONC, --saturationc SATURATIONC  Saturation for colored lines
+-sh SHARPNESS, --sharpness SHARPNESS          Sharpness for thicker lines, 0 to disable
 -v, --verbose                                 Print more information to stdout
 ```
 

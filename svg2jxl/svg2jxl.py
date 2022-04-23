@@ -100,7 +100,7 @@ def sample_line(p0, p1):
   return points or [p0, p1]
 
 
-def create_spline(points, args, color):
+def create_spline(points, args, color, thickness):
   if len(points) > 2:
     old_len = len(points)
     points = optimize.optimize(points, args.error * (args.scale**2))
@@ -123,14 +123,20 @@ def create_spline(points, args, color):
              1] = [points[i][0] + direction[0], points[i][1] + direction[1]]
 
   if color[0] != color[1] or color[0] != color[2]:
-    thickness = args.thicknessc
+    thickness *= args.thicknessc
     sat = args.saturationc
   else:
-    thickness = args.thickness
+    thickness *= args.thickness
     sat = args.saturation
 
+  bitdepth = args.bitdepth
+
+  if args.sharpness > 0 and thickness > 0.5:
+    thickness -= args.sharpness / 4
+    bitdepth += args.sharpness
+
   new_color = [
-    round((c / 255 - 1) * (2**(args.bitdepth - 1) - 1)) * sat for c in color
+    round((c / 255 - 1) * (2**(bitdepth - 1) - 1)) * sat for c in color
   ]
 
   spline = [
@@ -174,27 +180,32 @@ def main():
   parser.add_argument("-t",
                       "--thickness",
                       type=float,
-                      default=0.5,
-                      help="thickness for black lines (default: 0.5)")
+                      default=0.25,
+                      help="Thickness for black lines (default: 0.25)")
   parser.add_argument("-tc",
                       "--thicknessc",
                       type=float,
-                      default=0.5,
-                      help="thickness for colored lines (default: 0.5)")
+                      default=0.25,
+                      help="Thickness for colored lines (default: 0.25)")
   parser.add_argument("-sat",
                       "--saturation",
                       type=float,
                       default=1,
-                      help="saturation for black lines (default: 1)")
+                      help="Saturation for black lines (default: 1)")
   parser.add_argument("-satc",
                       "--saturationc",
                       type=float,
                       default=1,
-                      help="saturation for colored lines (default: 1)")
+                      help="Saturation for colored lines (default: 1)")
+  parser.add_argument("-sh",
+                      "--sharpness",
+                      type=int,
+                      default=1,
+                      help="Sharpness for thicker lines (default: 1)")
   parser.add_argument("-v",
                       "--verbose",
                       action="store_true",
-                      help="print more information to stdout")
+                      help="Print more information to stdout")
 
   args = parser.parse_args()
 
@@ -239,6 +250,7 @@ RCT 0
 
     for path, attribute in zip(paths, attributes):
       color = "#000000"
+      thickness = 1
       # Currently does not support classes (url(#id))
 
       if "fill" in attribute:
@@ -263,6 +275,9 @@ RCT 0
 
       if "fill-opacity" in attribute:
         if float(attribute["fill-opacity"]) == 0: continue
+
+      if "stroke-width" in attribute:
+        thickness = float(attribute["stroke-width"])
 
       current_spline = []
       for segment in path:
@@ -294,7 +309,7 @@ RCT 0
               cubic_points.reverse()
 
             if dist(current_spline[-1], cubic_points[0]) > 1:
-              spline = create_spline(current_spline, args, color)
+              spline = create_spline(current_spline, args, color, thickness)
               if spline:
                 spline_str = "\n".join(spline)
                 if spline_str not in splines:
@@ -327,7 +342,7 @@ RCT 0
               cubic_points.reverse()
 
             if dist(current_spline[-1], cubic_points[0]) > 1:
-              spline = create_spline(current_spline, args, color)
+              spline = create_spline(current_spline, args, color, thickness)
               if spline:
                 spline_str = "\n".join(spline)
                 if spline_str not in splines:
@@ -345,7 +360,7 @@ RCT 0
           path.extend(segment.as_cubic_curves(curves=2))
 
       if current_spline:
-        spline = create_spline(current_spline, args, color)
+        spline = create_spline(current_spline, args, color, thickness)
         if spline:
           spline_str = "\n".join(spline)
           if spline_str not in splines:
