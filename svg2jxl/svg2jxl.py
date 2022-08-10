@@ -214,12 +214,12 @@ def main():
   tree = xml.etree.ElementTree.parse(args.input)
   root = tree.getroot()
 
-  viewBox = [0,0,0,0]
+  viewBox = [0, 0, 0, 0]
 
   try:
     viewBox = [float(x) for x in root.attrib["viewBox"].split(" ")]
   except:
-    viewBox = [0,0,float(root.attrib["width"]),float(root.attrib["height"])]
+    viewBox = [0, 0, float(root.attrib["width"]), float(root.attrib["height"])]
 
   off_x = -viewBox[0]
   off_y = -viewBox[1]
